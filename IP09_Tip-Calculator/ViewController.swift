@@ -8,6 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    //IB outlets
     @IBOutlet var titleLbl: UILabel!
     
     @IBOutlet var tipDisplay: UILabel!
@@ -17,9 +19,9 @@ class ViewController: UIViewController {
     @IBOutlet var tipSelector: UISegmentedControl!
     
     
-    var billAmt: Double = 0.00
-    
-    
+    //variables
+    var billAmt:Double = 0.00
+    var tipPerc: Double = 0.15
     let tipArr: [Double] = [0.15,0.18,0.20,0.25]
     
     
@@ -28,24 +30,56 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
 
-    
-    
-    @IBAction func billAmountChanged(_ sender: UITextField) {
-        print("done!")
+    @IBAction func resetAll(_ sender: Any) {
+        self.billAmt = 0.00
+        self.tipPerc = 0.15
+        billAmtField.text = ""
+        updateVals()
+        
     }
+    
+    //triggered by a change value of bill
     @IBAction func billAmtChanged(_ sender: UITextField) {
-        print("done")
-    }
-    
-    func setTip() {
+        
+        //remove $ if its in the text
+        if(sender.text==nil) {
+            return
+        }
+        var billTemp: String = sender.text!
+        if(billTemp.hasPrefix("$")) {
+            billTemp.remove(at: billTemp.firstIndex(of: "$")!)
+            
+        }
+
+        //convert to decimal and store
+        if (billTemp.count >= 1) {
+            let numFormat = NumberFormatter()
+            numFormat.numberStyle = NumberFormatter.Style.decimal
+            self.billAmt = numFormat.number(from: billTemp) as! Double
+          
+        }
+        else {
+            self.billAmt = 0.00
+        }
+        
+        //update labels
+        updateVals()
         
     }
+
+    @IBAction func tipChanged(_ sender: Any) {
+        self.tipPerc = tipArr [tipSelector.selectedSegmentIndex]
+        updateVals()
+    }
     
-    func calculateTip() {
-        var tipPerc: Double = tipArr [tipSelector.selectedSegmentIndex]
-        //var billVal: Double = (billAmtField.text![1...] as? Double)!
+    //update the labels
+    func updateVals() {
+        //var tipPerc: Double =
+        let tipVal = self.billAmt * tipPerc
+        let total = self.billAmt + tipVal
         
-        
+        self.totalDisplay.text = "$" + String(format: "%.2f", total)
+        self.tipDisplay.text = "$" + String(format: "%.2f", tipVal)
     }
     
 }
